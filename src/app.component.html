@@ -1,0 +1,141 @@
+<div class="flex h-screen bg-slate-50 text-slate-800">
+  
+  <!-- Left Panel: Context & Current Status -->
+  <aside class="w-80 bg-white border-r border-slate-200 flex flex-col z-10 shadow-sm">
+    <div class="p-6 border-b border-slate-100">
+      <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
+        Transparent Tunes
+      </h1>
+      <p class="text-xs text-slate-400 mt-1">Spec-Driven Recommendation Engine</p>
+    </div>
+
+    <!-- Context Controls -->
+    <div class="p-6 border-b border-slate-100">
+      <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Context: Time of Day</h2>
+      <div class="grid grid-cols-3 gap-2">
+        @for (time of ['Morning', 'Work', 'Evening']; track time) {
+          <button 
+            (click)="setTime($any(time))"
+            [class]="currentTime() === time 
+              ? 'bg-blue-600 text-white shadow-md' 
+              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+            class="py-2 px-1 rounded-lg text-sm font-medium transition-all"
+          >
+            {{ time }}
+          </button>
+        }
+      </div>
+      <div class="mt-4 p-3 bg-slate-50 rounded-lg border border-slate-100 text-center">
+        <span class="text-3xl block mb-1">{{ getTimeIcon(currentTime()) }}</span>
+        <span class="text-sm font-medium text-slate-600">Current Ruleset: {{ currentTime() }}</span>
+      </div>
+    </div>
+
+    <!-- Currently Playing -->
+    <div class="p-6 flex-1 flex flex-col overflow-hidden">
+      <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-4">Now Playing</h2>
+      
+      @if (currentlyPlaying(); as current) {
+        <div class="bg-indigo-50 border border-indigo-100 rounded-xl p-5 mb-4 shadow-sm relative overflow-hidden">
+          <div class="relative z-10">
+            <div class="text-indigo-600 text-xs font-bold mb-1 uppercase tracking-wide">Selected Track</div>
+            <h3 class="text-lg font-bold text-slate-900 leading-tight mb-1">{{ current.title }}</h3>
+            <p class="text-slate-500 text-sm mb-3">{{ current.channel }}</p>
+            
+            <div class="flex flex-wrap gap-2">
+              <span class="px-2 py-1 bg-white/60 text-indigo-900 text-xs rounded-md font-medium border border-indigo-100/50">
+                {{ current.derived.genre }}
+              </span>
+              <span class="px-2 py-1 bg-white/60 text-indigo-900 text-xs rounded-md font-medium border border-indigo-100/50">
+                 {{ current.derived.energy }} Energy
+              </span>
+            </div>
+          </div>
+          <!-- Decorative BG element -->
+          <div class="absolute -bottom-6 -right-6 w-24 h-24 bg-indigo-200 rounded-full opacity-20 blur-xl"></div>
+        </div>
+      } @else {
+        <div class="flex-1 flex flex-col items-center justify-center text-slate-400 border-2 border-dashed border-slate-200 rounded-xl">
+          <span class="text-2xl mb-2">🎵</span>
+          <p class="text-sm">Select a track to start</p>
+        </div>
+      }
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex flex-col overflow-hidden relative">
+    
+    <!-- Top Recommendation Section (Hero) -->
+    <div class="bg-white border-b border-slate-200 p-8 shadow-sm z-10">
+      <div class="max-w-4xl mx-auto">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <span class="text-emerald-500">★</span> Top Recommendation
+          </h2>
+          <span class="text-xs font-mono text-slate-400 bg-slate-100 px-2 py-1 rounded">Score: {{ topRecommendation().score }}</span>
+        </div>
+
+        @if (topRecommendation(); as rec) {
+          <div class="flex flex-col md:flex-row gap-6">
+            <!-- The Track Card -->
+            <div class="w-full md:w-1/3">
+              <app-track-card 
+                [track]="rec.track" 
+                (play)="playTrack($event)">
+              </app-track-card>
+            </div>
+
+            <!-- The "Why" Section (Explainability) -->
+            <div class="flex-1 bg-emerald-50/50 border border-emerald-100 rounded-xl p-5">
+              <h3 class="text-sm font-bold text-emerald-800 uppercase tracking-wide mb-3">Why this track?</h3>
+              <ul class="space-y-2">
+                @for (reason of rec.explanations; track reason) {
+                  <li class="flex items-start text-sm text-emerald-900">
+                    <span class="mr-2 mt-1 block h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                    {{ reason }}
+                  </li>
+                }
+              </ul>
+              
+              @if (rec.explanations.length === 0) {
+                 <p class="text-sm text-slate-400 italic">No specific rule triggered. Default ranking.</p>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Candidate List -->
+    <div class="flex-1 overflow-y-auto p-8 bg-slate-50">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">All Candidates (Ranked)</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-20">
+          @for (rec of recommendations(); track rec.track.id) {
+            <!-- Don't show the top one again here to avoid visual redundancy, or maybe style it differently? 
+                 Let's just show all for clarity but highlight scores. -->
+            <div class="relative">
+              <div class="absolute -top-2 -right-2 z-10 bg-slate-800 text-white text-xs font-mono py-1 px-2 rounded-lg shadow-sm border border-white">
+                {{ rec.score }}
+              </div>
+              <app-track-card 
+                [track]="rec.track" 
+                [isActive]="currentlyPlaying()?.id === rec.track.id"
+                (play)="playTrack($event)">
+              </app-track-card>
+              
+              <!-- Mini explanation for list items -->
+              <div class="mt-1 px-2">
+                @if (rec.explanations.length > 0) {
+                   <p class="text-[10px] text-slate-500 truncate">{{ rec.explanations[0] }}</p>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

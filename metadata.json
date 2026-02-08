@@ -1,0 +1,5 @@
+{
+  "name": "Transparent Tunes",
+  "description": "A rule-based, deterministic music recommendation engine focusing on explainability.",
+  "requestFramePermissions": []
+}
