@@ -6,13 +6,18 @@ import { Track, RecommendationScore, TimeOfDay } from '../models/music.types';
 })
 export class RecommendationEngineService {
 
-  // Implementation of Specification 3: Recommendation Rules
-  recommend(candidates: Track[], lastPlayed: Track | null, timeOfDay: TimeOfDay): RecommendationScore[] {
+  // Implementation of Specification 3 & 4: Recommendation Rules
+  recommend(
+    candidates: Track[], 
+    lastPlayed: Track | null, 
+    timeOfDay: TimeOfDay,
+    discoveryMode: boolean
+  ): RecommendationScore[] {
     return candidates.map(track => {
       let score = 0;
       const explanations: string[] = [];
 
-      // --- Rule 1: Anti-Repetition ---
+      // --- Rule 1: Anti-Repetition (Hard Constraint) ---
       if (lastPlayed && track.id === lastPlayed.id) {
         score -= 999;
         explanations.push('Penalized: Recently played');
@@ -50,6 +55,14 @@ export class RecommendationEngineService {
         if (track.derived.genre === lastPlayed.derived.genre) {
           score += 5;
           explanations.push(`Boost: Matches previous genre (${track.derived.genre})`);
+        }
+      }
+
+      // --- Rule 4: Discovery Mode (Artist Diversity) ---
+      if (discoveryMode && lastPlayed) {
+        if (track.channel === lastPlayed.channel) {
+          score -= 30;
+          explanations.push('Penalty: Artist repetition in Discovery Mode');
         }
       }
 

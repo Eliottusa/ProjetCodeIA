@@ -5,20 +5,20 @@ import { Track, DerivedAttributes, Genre, EnergyLevel, TempoLevel } from '../mod
   providedIn: 'root'
 })
 export class MusicDataService {
-  // Simulating a database of raw metadata
+  // Simulating a database of raw metadata with REAL YouTube IDs
   private rawTracks = [
-    { id: '1', title: 'Rainy Night Coffee', channel: 'Lofi Girl', tags: ['lofi', 'chill', 'sleep', 'instrumental'], duration: 180 },
-    { id: '2', title: 'Neon Highway', channel: 'SynthWave Central', tags: ['electronic', 'upbeat', 'drive', 'retro'], duration: 240 },
-    { id: '3', title: 'Heavy Lifting', channel: 'Gym Rats', tags: ['rock', 'workout', 'metal', 'power'], duration: 210 },
-    { id: '4', title: 'Morning Jazz Vibes', channel: 'Cafe Music', tags: ['jazz', 'relax', 'morning', 'piano'], duration: 300 },
-    { id: '5', title: 'Code Focus', channel: 'Dev Tunes', tags: ['electronic', 'focus', 'coding', 'ambient'], duration: 600 },
-    { id: '6', title: 'Summer Pop Hits', channel: 'Top Charts', tags: ['pop', 'dance', 'party', 'summer'], duration: 190 },
-    { id: '7', title: 'Moonlight Sonata', channel: 'Classic FM', tags: ['classical', 'piano', 'night', 'sleep'], duration: 900 },
-    { id: '8', title: 'Cyberpunk Chase', channel: 'Dark Synth', tags: ['electronic', 'fast', 'intense', 'gaming'], duration: 150 },
-    { id: '9', title: 'Study With Me', channel: 'Academia', tags: ['lofi', 'study', 'calm'], duration: 400 },
-    { id: '10', title: 'Hard Rock Anthem', channel: 'Rock Legends', tags: ['rock', 'classic', 'guitar'], duration: 245 },
-    { id: '11', title: 'Smooth Saxophone', channel: 'Jazz Club', tags: ['jazz', 'romantic', 'dinner'], duration: 320 },
-    { id: '12', title: 'Deep Sleep Beta Waves', channel: 'Mindful', tags: ['ambient', 'sleep', 'meditation'], duration: 1200 },
+    { id: 'jfKfPfyJRdk', title: 'lofi hip hop radio', channel: 'Lofi Girl', tags: ['lofi', 'chill', 'sleep', 'instrumental'], duration: 180 },
+    { id: 'wOMwO5T3y7c', title: 'Synthwave Mix 2024', channel: 'SynthWave Central', tags: ['electronic', 'upbeat', 'drive', 'retro'], duration: 240 },
+    { id: 'pUZeSYsU0Uk', title: 'Best Rock Songs', channel: 'Rock Legends', tags: ['rock', 'workout', 'metal', 'power'], duration: 210 },
+    { id: 'NeXMjuQRZL0', title: 'Morning Jazz', channel: 'Cafe Music', tags: ['jazz', 'relax', 'morning', 'piano'], duration: 300 },
+    { id: '5qap5aO4i9A', title: 'Code & Chill', channel: 'Lofi Girl', tags: ['lofi', 'focus', 'coding', 'ambient'], duration: 600 },
+    { id: 'fLexgOxsZu0', title: 'Top Pop 2024', channel: 'Top Charts', tags: ['pop', 'dance', 'party', 'summer'], duration: 190 },
+    { id: '4Tr0otuiQuU', title: 'Moonlight Sonata', channel: 'Classic FM', tags: ['classical', 'piano', 'night', 'sleep'], duration: 900 },
+    { id: 'Q04ILDXe3QE', title: 'Cyberpunk City', channel: 'Dark Synth', tags: ['electronic', 'fast', 'intense', 'gaming'], duration: 150 },
+    { id: '-FlxM_0S2lA', title: 'Study With Me', channel: 'Lofi Girl', tags: ['lofi', 'study', 'calm'], duration: 400 },
+    { id: 'Nco_kh8xJDs', title: 'Hard Rock Training', channel: 'Rock Legends', tags: ['rock', 'classic', 'guitar'], duration: 245 },
+    { id: '3s7c1zF6pZk', title: 'Smooth Jazz Club', channel: 'Jazz Club', tags: ['jazz', 'romantic', 'dinner'], duration: 320 },
+    { id: 'l7TxwBhtTUY', title: 'Deep Sleep Music', channel: 'Mindful', tags: ['ambient', 'sleep', 'meditation'], duration: 1200 },
   ];
 
   readonly tracks = signal<Track[]>([]);

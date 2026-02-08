@@ -11,7 +11,7 @@ Design a music recommendation engine based exclusively on explicit, deterministi
     *   *Raw Metadata*: Title, Channel, Duration, Tags.
     *   *Derived Attributes*: Computed via explicit keyword rules (e.g., tag "chill" -> Energy: Low).
 2.  **Rules Layer**: A collection of scoring functions.
-    *   Input: Context (Time, History) + Candidate Track.
+    *   Input: Context (Time, History, Mode) + Candidate Track.
     *   Output: Score modification + Log (Explanation).
 3.  **Engine**: Coordinator.
     *   Applies all rules to all candidates.
@@ -19,44 +19,47 @@ Design a music recommendation engine based exclusively on explicit, deterministi
     *   Returns top recommendation with explanation trace.
 4.  **Interface**: Visualizes tracks, current context, and the "Why" behind recommendations.
 
-## Current Task: Define Music Data Model & Basic Rules
-**Status**: In Progress
-**Objective**: Define the `Track` interface and the rules to derive attributes from raw YouTube-like metadata.
+## Completed Tasks
+- [x] Define Music Data Model & Basic Rules
+- [x] Represent a YouTube video as a playable music track (Data update)
 
-### Specification 1: Data Model
+## Current Task: Implement Playback & Advanced Rules
+**Status**: In Progress
+**Objective**: Enable music playback and implement "Discovery Mode".
+
+### Specification 1: Data Model (Frozen)
 A `Track` consists of:
-*   `id`: string (unique)
-*   `title`: string
-*   `channel`: string
+*   `id`: string (YouTube Video ID)
+*   `title`, `channel`: string
 *   `tags`: string[]
 *   `duration`: number (seconds)
-*   `derived`:
-    *   `genre`: string (Enforced set: 'Lofi', 'Rock', 'Pop', 'Jazz', 'Electronic', 'Classical', 'Unknown')
-    *   `energy`: 'Low' | 'Medium' | 'High'
-    *   `tempo`: 'Slow' | 'Medium' | 'Fast'
+*   `derived`: `genre`, `energy`, `tempo`
 
-### Specification 2: Attribute Derivation Rules (V1)
-These rules convert raw metadata into derived attributes.
-*   **Genre**: First match in `tags` against known genres. Default 'Unknown'.
-*   **Energy**:
-    *   IF tags contain ['chill', 'relax', 'sleep', 'ambient', 'lofi'] -> 'Low'
-    *   IF tags contain ['metal', 'rock', 'workout', 'upbeat', 'dance'] -> 'High'
-    *   ELSE -> 'Medium'
-*   **Tempo**:
-    *   IF Energy is 'Low' -> 'Slow'
-    *   IF Energy is 'High' AND Duration < 180 -> 'Fast'
-    *   ELSE -> 'Medium'
+### Specification 2: Attribute Derivation Rules (Frozen)
+*   **Genre**: Keyword match (Lofi, Rock, Pop, etc.)
+*   **Energy**: Low (chill/sleep), High (rock/workout), else Medium.
+*   **Tempo**: Derived from Energy + Duration.
 
-### Specification 3: Recommendation Rules (V1)
-*   **Time of Day Rule**:
-    *   Morning (05:00 - 11:59) -> Prefer 'Medium' Energy (+10 pts)
-    *   Work (12:00 - 17:59) -> Prefer 'High' Energy (+10 pts)
-    *   Evening (18:00 - 04:59) -> Prefer 'Low' Energy (+10 pts)
-*   **Anti-Repetition Rule**:
-    *   IF track.id == last_played.id -> Disqualify (-999 pts)
-*   **Genre Continuity Rule**:
-    *   IF track.genre == last_played.genre -> Bonus (+5 pts)
+### Specification 3: Standard Recommendation Rules (Frozen)
+*   **Time of Day**: Morning (Medium +10, High -5), Work (High +10, Med +5), Evening (Low +10, High -10).
+*   **Anti-Repetition**: IF track.id == last_played.id -> -999 pts.
+*   **Genre Continuity**: IF track.genre == last_played.genre -> +5 pts.
 
-## Future Tasks
-- [ ] Refine "Genre Continuity" to include compatible genres (e.g., Lofi -> Jazz).
-- [ ] Add "Discovery Mode" rule to penalize recently played artists.
+### Specification 4: Discovery Mode (New)
+*   **Definition**: A user-toggled mode to encourage artist variety.
+*   **Rule**:
+    *   IF `Discovery Mode` is ON
+    *   AND `track.channel` == `last_played.channel`
+    *   THEN Penalize (-30 pts).
+    *   Log: "Penalty: Artist repetition in Discovery Mode".
+
+### Specification 5: Playback Interface (New)
+*   **Mechanism**: Use YouTube IFrame Embed API.
+*   **Behavior**:
+    *   When a track is selected, replace the "Now Playing" card with an embedded video player.
+    *   Auto-play should be enabled (`autoplay=1`).
+    *   The player must be sanitized for security.
+
+## Planned Tasks
+- [ ] Add "Mood Match" feature where user selects current mood (Happy, Sad, Focused).
+- [ ] Visualize the rule weights dynamically.
